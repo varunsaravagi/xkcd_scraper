@@ -37,19 +37,23 @@ def download(url):
 	global count
 	try:
 		soup = make_soup(url)
+		img_pane = soup.find(id='comic')
+		img_url= img_pane.img['src']
+		filename = dir_path+url.split('/')[-2]+'_'+img_url.split('/')[-1]
+		if os.path.isfile(filename):
+			print 'Image ', filename.split('/')[-1], ' exists'
+		else:
+			urllib.urlretrieve(img_url,filename)
+			print 'Downloaded ', filename
+			count += 1
+	
 	except urllib2.HTTPError as e:
 		print str(e) + " " +url
 		exit()
+	except:
+		print sys.exc_info()[0], " ", url, " skipped"
+		pass
 	
-	img_pane = soup.find(id='comic')
-	img_url= img_pane.img['src']
-	filename = dir_path+url.split('/')[-2]+'_'+img_url.split('/')[-1]
-	if os.path.isfile(filename):
-		print 'Image ', filename.split('/')[-1], ' exists'
-	else:
-		urllib.urlretrieve(img_url,filename)
-		print 'Downloaded ', filename
-		count += 1
 	download(make_url(soup))
 
 download(init_url)
